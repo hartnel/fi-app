@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
-from authentication.constants import RegexCts
+from authentication.constants import AdditionalPhoneNumberCts, RegexCts
 from django.utils.timezone import now
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -88,8 +88,26 @@ class CustomUser(AbstractUser):
     objects = NonDeletedManager()
 
     all_objects = CustomUserManager()
+    
+    location = models.ForeignKey("common.Location", on_delete=models.CASCADE, blank=True, null=True)
 
     USERNAME_FIELD = "phone_number"
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.phone_number})"
+    
+    
+class AdditionalPhoneNumber(models.Model):
+    phone_number = models.CharField(
+        blank=False,
+        unique=False,
+        null=False,
+        max_length=120,
+        validators=[phone_validator],
+    )
+    
+    type = models.CharField(max_length=120, blank=False, null=False, choices=AdditionalPhoneNumberCts.PHONE_NUMBER_TYPE_CHOICES, default=AdditionalPhoneNumberCts.NORMAL)
+    
+    is_verified = models.BooleanField(default=False)
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="additional_phone_numbers")
