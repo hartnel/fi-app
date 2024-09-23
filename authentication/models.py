@@ -6,13 +6,13 @@ from authentication.constants import AdditionalPhoneNumberCts, RegexCts
 from django.utils.timezone import now
 
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 # Create your models here.
 phone_validator = RegexValidator(
-        regex=RegexCts.PHONE_REGEX, message="Invalid phone number"
+    regex=RegexCts.PHONE_REGEX, message="Invalid phone number"
 )
 
 
