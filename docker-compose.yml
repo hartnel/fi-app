@@ -25,7 +25,7 @@ services:
       - staticfiles:/code/staticfiles
       - mediafiles:/code/media
     ports:
-      - "8002:8002"
+      - "8000:8000"
     depends_on:
       - db
       - rabbitmq
