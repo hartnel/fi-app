@@ -1,0 +1,66 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+      image: rabbitmq:3.12.7-management-alpine
+      # restart: always
+      environment:
+        - RABBITMQ_DEFAULT_USER=root
+        - RABBITMQ_DEFAULT_PASS=password
+        - RABBITMQ_DEFAULT_VHOST=myvhost
+      ports:
+        - '15673:15673'
+  db:
+    image: postgis/postgis
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+  web:
+    build: .
+    command: sh -c "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+      - ./static:/code/static
+      - staticfiles:/code/staticfiles
+      - mediafiles:/code/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+
+    env_file:
+      - .env
+    restart: on-failure
+
+  celery_networking:
+    build: .
+    command: sh -c "pip install -r requirements.txt && celery -A taxi worker -Q network,notifier  -P gevent --concurrency=200  --loglevel=INFO -n networking@%h"
+    #image: app-image
+    volumes:
+      - .:/code
+    env_file:
+      - '.env'
+    depends_on: 
+      - db
+      - rabbitmq
+    #hostname: celery_networking
+    # restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 400M
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  staticfiles:
+  db-data:
+  mediafiles:
