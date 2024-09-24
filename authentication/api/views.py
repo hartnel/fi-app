@@ -183,6 +183,43 @@ class AuthViewSet(viewsets.ViewSet):
         }
         
         return Response(data, status=status.HTTP_200_OK)
+    
+    
+    
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    field: openapi.Schema(type=openapi.TYPE_STRING)  # Adjust type as needed
+                    for field in UserSerializer().fields
+                },
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
+        },
+    )
+    @action(
+        methods=["GET"],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path="user",
+        url_name="user",
+    )
+    @transaction.atomic
+    def user(self, request):
+        """
+        
+        This endpoint is used to load the current user
+        
+        """
+        user = request.user
+        data = UserSerializer(user).data
+        return Response(data, status=status.HTTP_200_OK)
+        
+        
+        
+        
+        
         
         
         
