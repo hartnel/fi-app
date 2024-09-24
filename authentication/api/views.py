@@ -41,8 +41,15 @@ class AuthViewSet(viewsets.ViewSet):
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
         },
     )
+    @action(
+        methods=["POST"],
+        detail=False,
+        permission_classes=[AllowAny],
+        url_path="signup",
+        url_name="signup",
+    )
     @transaction.atomic
-    def create(self, request):
+    def signup(self, request):
         """
         This endpoint is used to create a new user
         """
