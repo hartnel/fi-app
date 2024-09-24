@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from authentication.models import OTPToken
 from authentication.constants import TokenCts
 from common.key_manager import KeyManager
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -16,7 +17,7 @@ class OTP:
     expiration_date: datetime
     
     def is_expired(self):
-        return datetime.now() > self.expiration_date
+        return timezone.now() > self.expiration_date
     
     
 class OTPExpired(Exception):
@@ -47,7 +48,7 @@ def _generate_otp(length=6, ttl:timedelta=timedelta(seconds=0)) -> OTP:
     
     """
     code = _generate_random_digits(n=length)
-    expiration_date = datetime.now() + ttl
+    expiration_date = timezone.now() + ttl
     
     return OTP(code=code, expiration_date=expiration_date)
 
@@ -57,7 +58,7 @@ def generate_and_save_otp_for(kind:str, user:User, extra_data={}): # type: ignor
     This function helps to generate and save otp for a user
     """
     
-    assert kind in TokenCts.TOKEN_TYPES, f"Invalid kind {kind}"
+    assert kind in TokenCts.TOKEN_TYPES_AS_LIST, f"Invalid kind {kind}"
     
     token_ttl_key = f"{kind}_TTL"
     token_length_key = f"{kind}_LENGTH"
@@ -86,7 +87,7 @@ def verify_code(kind:str, user:User, code:str): # type: ignore
     
     """
     
-    assert kind in TokenCts.TOKEN_TYPES, f"Invalid kind {kind}"
+    assert kind in TokenCts.TOKEN_TYPES_AS_LIST, f"Invalid kind {kind}"
     
     otp_token = OTPToken.objects.filter(
         user=user,
@@ -99,7 +100,7 @@ def verify_code(kind:str, user:User, code:str): # type: ignore
     if otp_token.token != code:
         raise InvalidOTP(f"Invalid OTP")
     
-    if otp_token.token_epires_at < datetime.now():
+    if otp_token.token_epires_at < timezone.now():
         raise OTPExpired(f"OTP expired")
     
     return otp_token
@@ -110,7 +111,7 @@ def regenerate_otp(kind:str, user:User): # type: ignore
     
     """
     
-    assert kind in TokenCts.TOKEN_TYPES, f"Invalid kind {kind}"
+    assert kind in TokenCts.TOKEN_TYPES_AS_LIST, f"Invalid kind {kind}"
     
     extra_data = {}
     

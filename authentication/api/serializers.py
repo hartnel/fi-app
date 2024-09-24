@@ -120,6 +120,7 @@ class LoginSerializer(serializers.Serializer):
         
         #try to get user
         user = User.objects.filter(phone_number=phone_number).first()
+        self.user = user
         
         if not user:
             raise serializers.ValidationError("Invalid User credentials")
@@ -132,6 +133,9 @@ class LoginSerializer(serializers.Serializer):
         
         return attrs
     
+    def save(self, **kwargs):
+        return self.user
+    
     
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -142,6 +146,8 @@ class UserSerializer(serializers.ModelSerializer):
             "email", 
             "first_name", 
             "last_name",
+            "phone_is_verified",
+            "email_is_verified",
         ]
         
         

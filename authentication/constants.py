@@ -26,3 +26,5 @@ class TokenCts:
     TOKEN_TYPES = (
         (PHONE_NUMBER_TOKEN, PHONE_NUMBER_TOKEN),
     )
+    
+    TOKEN_TYPES_AS_LIST = [t[0] for t in TOKEN_TYPES]
