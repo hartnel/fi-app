@@ -14,6 +14,7 @@ from pathlib import Path
 import dj_database_url
 import os
 import logging
+from datetime import timedelta
 
 
 logger = logging.getLogger(__name__)
@@ -181,6 +182,28 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": "1",
 }
 
+
+####################### JWT ############################################""
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=6 * 31),  # 6 months
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=12 * 31),  # 1 year
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("JWT", "Bearer"),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+}
+
 ######################### LOGGIN CONFIGURATION ##########################
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+
+######################### CRYPTOGRAPHY CONFIGURATION ##########################
+ENCRIPTION_KEY = os.getenv("ENCRIPTION_KEY", "1" * 32)

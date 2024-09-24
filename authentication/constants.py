@@ -16,3 +16,13 @@ class AdditionalPhoneNumberCts:
         (WHATSAPP, WHATSAPP),
         (NORMAL, NORMAL),
     ]
+    
+
+class TokenCts:
+    
+    PHONE_NUMBER_TOKEN = "PHONE_NUMBER_TOKEN"
+    
+    
+    TOKEN_TYPES = (
+        (PHONE_NUMBER_TOKEN, PHONE_NUMBER_TOKEN),
+    )

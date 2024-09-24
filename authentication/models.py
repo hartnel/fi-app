@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
-from authentication.constants import AdditionalPhoneNumberCts, RegexCts
+from authentication.constants import AdditionalPhoneNumberCts, RegexCts, TokenCts
 from django.utils.timezone import now
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -111,3 +111,21 @@ class AdditionalPhoneNumber(models.Model):
     is_verified = models.BooleanField(default=False)
     
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="additional_phone_numbers")
+    
+    
+    
+class OTPToken(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    kind = models.CharField(max_length=50, choices=TokenCts.TOKEN_TYPES)
+    token = models.CharField(max_length=120)
+    token_epires_at = models.DateTimeField(default=now)
+    extra_data = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        unique_together = (
+            "kind",
+            "user",
+        )
+
+    def __str__(self) -> str:
+        return str(self.user) + "-" + self.kind

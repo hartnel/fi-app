@@ -1,1 +1,3 @@
 # fi-app
+
+#ALL DYNAMIC ENVS
