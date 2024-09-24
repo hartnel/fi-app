@@ -29,31 +29,27 @@ class OTPNotFound(Exception):
 class InvalidOTP(Exception):
     pass
 
-
-
-def _generate_random_digits(n=6, samples:list=range(10)):
+def _generate_random_values(n=6, alphabet="0123456789"):
     """
-    This function helps to generate random digits
+    This function helps to generate random values
     
     """
     
-    return "".join(["0"]*n)
-    
-    return "".join(map(str, random.sample(samples, n)))
+    return "".join(random.choices(alphabet, k=n))
 
 
-def _generate_otp(length=6, ttl:timedelta=timedelta(seconds=0)) -> OTP:
+def _generate_otp(length=6, ttl:timedelta=timedelta(seconds=0), alphabet="0000000") -> OTP:
     """
     This function helps to generate otp
     
     """
-    code = _generate_random_digits(n=length)
+    code = _generate_random_values(n=length, alphabet=alphabet)
     expiration_date = timezone.now() + ttl
     
     return OTP(code=code, expiration_date=expiration_date)
 
 
-def generate_and_save_otp_for(kind:str, user:User, extra_data={}): # type: ignore
+def generate_and_save_otp_for(kind:str, user:User, extra_data={})->OTPToken: # type: ignore
     """
     This function helps to generate and save otp for a user
     """
@@ -62,11 +58,13 @@ def generate_and_save_otp_for(kind:str, user:User, extra_data={}): # type: ignor
     
     token_ttl_key = f"{kind}_TTL"
     token_length_key = f"{kind}_LENGTH"
+    token_alphabet_key = f"{kind}_ALPHABET"
     
-    token_ttl_sec = KeyManager.get(token_ttl_key, 60*5)
-    token_length = KeyManager.get(token_length_key, 6)
+    token_ttl_sec = KeyManager.get(token_ttl_key, 60*5, value_type=int)
+    token_length = KeyManager.get(token_length_key, 6, value_type=int)
+    token_alphabet = KeyManager.get(token_alphabet_key, "0123456789", value_type=str)
     
-    otp = _generate_otp(length=token_length, ttl=timedelta(seconds=token_ttl_sec))
+    otp = _generate_otp(length=token_length, ttl=timedelta(seconds=token_ttl_sec), alphabet=token_alphabet)
     
     # save the otp
     otp_token = OTPToken.objects.create(
@@ -95,13 +93,13 @@ def verify_code(kind:str, user:User, code:str): # type: ignore
     ).first()
     
     if not otp_token:
-        raise OTPNotFound(f"OPT not found")
+        raise OTPNotFound(f"UnExisting code")
     
     if otp_token.token != code:
-        raise InvalidOTP(f"Invalid OTP")
+        raise InvalidOTP(f"Invalid code")
     
     if otp_token.token_epires_at < timezone.now():
-        raise OTPExpired(f"OTP expired")
+        raise OTPExpired(f"Expired code")
     
     return otp_token
 

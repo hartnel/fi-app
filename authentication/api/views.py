@@ -21,25 +21,19 @@ class AuthViewSet(viewsets.ViewSet):
             status.HTTP_201_CREATED: openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    "user": openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            field: openapi.Schema(type=openapi.TYPE_STRING)  # Adjust type as needed
-                            for field in UserSerializer().fields
-                        }
+                    "user_id": openapi.Schema(
+                        type=openapi.TYPE_STRING,
                     ),
-                    "tokens": openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            "access": openapi.Schema(type=openapi.TYPE_STRING),
-                            "refresh": openapi.Schema(type=openapi.TYPE_STRING),
-                        },
+                    "security_token": openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="This token is used to authenticate the signup process (just for securty reasons)",
                     ),
                 },
                     
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
         },
+        tags=['Authentication'],
     )
     @action(
         methods=["POST"],
@@ -55,12 +49,11 @@ class AuthViewSet(viewsets.ViewSet):
         """
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user, security_otp = serializer.save()
         #generate jwt token
-        jwt = get_tokens_for_user(user)
         result = {
-            "user" : UserSerializer(user).data,
-            "tokens" : jwt,
+            "user_id" : user.id,
+            "security_token" : security_otp.token,
         }
         
         return Response(result, status=status.HTTP_201_CREATED)
@@ -71,19 +64,32 @@ class AuthViewSet(viewsets.ViewSet):
         responses={
             status.HTTP_200_OK: openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                properties={
-                    field: openapi.Schema(type=openapi.TYPE_STRING)  # Adjust type as needed
-                    for field in UserSerializer().fields
+                properties= {
+                    "user": openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            field: openapi.Schema(type=openapi.TYPE_STRING)  # Adjust type as needed
+                            for field in UserSerializer().fields
+                        }
+                    ),
+                    "tokens": openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "access": openapi.Schema(type=openapi.TYPE_STRING),
+                            "refresh": openapi.Schema(type=openapi.TYPE_STRING),
+                        },
+                    ),
                 }
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
             status.HTTP_401_UNAUTHORIZED: openapi.Response(description="Unauthorized"),
         },
+        tags=['Authentication'],
     )
     @action(
         methods=["POST"],
         detail=False,
-        permission_classes=[IsAuthenticated],
+        permission_classes=[AllowAny],
         url_path="phone-verification",
         url_name="phone_verification",
     )
@@ -96,6 +102,11 @@ class AuthViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserSerializer(user).data
+        jwt = get_tokens_for_user(user)
+        data = {
+            "user": data,
+            "tokens": jwt,
+        }
         
         return Response(data, status=status.HTTP_200_OK)
     
@@ -111,11 +122,12 @@ class AuthViewSet(viewsets.ViewSet):
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
             status.HTTP_401_UNAUTHORIZED: openapi.Response(description="Unauthorized"),
         },
+        tags=['Authentication'],
     )
     @action(
         methods=["POST"],
         detail=False,
-        permission_classes=[IsAuthenticated],
+        permission_classes=[AllowAny],
         url_path="resend-phone-verification",
         url_name="resend_phone_verification",
     )
@@ -158,6 +170,7 @@ class AuthViewSet(viewsets.ViewSet):
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
         },
+        tags=['Authentication'],
     )
     @action(
         methods=["POST"],
@@ -197,6 +210,7 @@ class AuthViewSet(viewsets.ViewSet):
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
         },
+        tags=['Authentication'],
     )
     @action(
         methods=["GET"],

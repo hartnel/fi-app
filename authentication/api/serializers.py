@@ -2,7 +2,7 @@ from rest_framework import serializers
 from authentication.constants import RegexCts, TokenCts
 from django.contrib.auth import get_user_model
 
-from authentication.utils.otp import generate_and_save_otp_for, regenerate_otp, verify_code
+from authentication.utils.otp import clear_otps, generate_and_save_otp_for, regenerate_otp, verify_code
 
 User = get_user_model()
 
@@ -44,21 +44,48 @@ class SignupSerializer(serializers.Serializer):
             user=user,
         )
         
-        return user
+        #generate security token
+        security_otp = generate_and_save_otp_for(
+            extra_data={},
+            kind=TokenCts.SIGNUP_SECURITY_TOKEN,
+            user=user,
+        )
+        
+        return user,security_otp
+    
+class WithSecurityToken(serializers.Serializer):
+    security_token = serializers.CharField(required=True)
     
     
-class PhoneVerificationSerializer(serializers.Serializer):
+    def _validate_security_token(self, value, user, kind):
+        security_token = value
+        try:
+            security_otp = verify_code(
+                kind=kind,
+                user=user,
+                code=security_token,
+            )
+            self.security_otp = security_otp
+        except Exception as e:
+            raise serializers.ValidationError({"security_token": str(e)})
+        
+        return value
+
+class PhoneVerificationSerializer(WithSecurityToken):
     otp = serializers.CharField(required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(phone_is_verified=False), required=True)
     
-    def get_user(self) -> User: #type: ignore
-        return self.context.get("request").user
     
     def validate(self, attrs):
-        user = self.get_user()
+        user = attrs.get("user")
         otp = attrs.get("otp")
         
-        if user.phone_is_verified:
-            raise serializers.ValidationError("Phone number is already verified")
+        #verify of the security token
+        self._validate_security_token(
+            value=self.initial_data.get("security_token"),
+            user=user,
+            kind=TokenCts.SIGNUP_SECURITY_TOKEN,
+        )
         
         try:
             otp_token = verify_code(
@@ -74,31 +101,36 @@ class PhoneVerificationSerializer(serializers.Serializer):
         
         
     def save(self, **kwargs):
-        user:User = self.get_user() #type: ignore
+        user:User = self.validated_data.get("user") #type: ignore
         user.phone_is_verified = True
         user.save(
             update_fields=["phone_is_verified",]
         )
         self.otp_token.delete()
+        #delete security token
+        self.security_otp.delete()
         
         return user
     
     
-class ResendPhoneVerificationSerializer(serializers.Serializer):
-    def get_user(self) -> User: #type: ignore
-        return self.context.get("request").user
+class ResendPhoneVerificationSerializer(WithSecurityToken):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(phone_is_verified=False), required=True)
     
     
     def validate(self, attrs):
-        user = self.get_user()
+        user = attrs.get("user")
         
-        if user.phone_is_verified:
-            raise serializers.ValidationError("Phone number is already verified")
+        #verify of the security token
+        self._validate_security_token(
+            value=self.initial_data.get("security_token"),
+            user=user,
+            kind=TokenCts.SIGNUP_SECURITY_TOKEN,
+        )
         
         return attrs
     
     def save(self, **kwargs):
-        user:User = self.get_user() #type: ignore
+        user:User = self.validated_data.get("user") #type: ignore
         
         regenerate_otp(
             kind=TokenCts.PHONE_NUMBER_TOKEN,
