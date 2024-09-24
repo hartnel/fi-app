@@ -88,8 +88,6 @@ class CustomUser(AbstractUser):
     objects = NonDeletedManager()
 
     all_objects = CustomUserManager()
-    
-    location = models.ForeignKey("common.Location", on_delete=models.CASCADE, blank=True, null=True)
 
     USERNAME_FIELD = "phone_number"
 

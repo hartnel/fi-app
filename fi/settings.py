@@ -177,7 +177,7 @@ REST_FRAMEWORK = {
         # "rest_framework.authentication.BasicAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    #"DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     
     "PAGE_SIZE": "1",
 }
@@ -207,3 +207,16 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 ######################### CRYPTOGRAPHY CONFIGURATION ##########################
 ENCRIPTION_KEY = os.getenv("ENCRIPTION_KEY", "1" * 32)
+
+
+########################## SWAGGER CONFIGURATION ##########################
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+}
