@@ -21,7 +21,10 @@ class Key(models.Model):
     @property
     def value(self):
         if self.encrypted_value:
-            encrypted_value_bytes = self.encrypted_value.tobytes()
+            if not isinstance(self.encrypted_value, bytes):
+                encrypted_value_bytes = self.encrypted_value.tobytes()
+            else:
+                encrypted_value_bytes = self.encrypted_value
             cipher_suite = Fernet(settings.ENCRIPTION_KEY.encode())
             return cipher_suite.decrypt(encrypted_value_bytes).decode()
         return None
