@@ -34,31 +34,31 @@ services:
       - .env
     restart: on-failure
 
-  celery_networking:
-    build: .
-    command: sh -c "pip install -r requirements.txt && celery -A taxi worker -Q network,notifier  -P gevent --concurrency=200  --loglevel=INFO -n networking@%h"
-    #image: app-image
-    volumes:
-      - .:/code
-    env_file:
-      - '.env'
-    depends_on: 
-      - db
-      - rabbitmq
-    #hostname: celery_networking
-    # restart: on-failure
-    deploy:
-      mode: replicated
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 500M
-        reservations:
-          cpus: '0.25'
-          memory: 400M
-      restart_policy:
-        condition: on-failure
+  # celery_networking:
+  #   build: .
+  #   command: sh -c "pip install -r requirements.txt && celery -A taxi worker -Q network,notifier  -P gevent --concurrency=200  --loglevel=INFO -n networking@%h"
+  #   #image: app-image
+  #   volumes:
+  #     - .:/code
+  #   env_file:
+  #     - '.env'
+  #   depends_on: 
+  #     - db
+  #     - rabbitmq
+  #   #hostname: celery_networking
+  #   # restart: on-failure
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: '0.25'
+  #         memory: 500M
+  #       reservations:
+  #         cpus: '0.25'
+  #         memory: 400M
+  #     restart_policy:
+  #       condition: on-failure
 
   nginx:
     image: nginx:alpine3.18-slim
