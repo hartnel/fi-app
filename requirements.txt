@@ -7,3 +7,4 @@ drf-yasg==1.21.7
 psycopg2>=2.8
 dj-database-url==2.2.0
 cryptography==43.0.1
+django-cors-headers==4.4.0
