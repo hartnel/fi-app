@@ -60,6 +60,16 @@ services:
       restart_policy:
         condition: on-failure
 
+  nginx:
+    image: nginx:alpine3.18-slim
+    volumes:
+      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf
+      - staticfiles:/code/staticfiles
+      - mediafiles:/code/media
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
 volumes:
   staticfiles:
   db-data:
