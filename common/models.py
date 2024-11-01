@@ -33,3 +33,11 @@ class Key(models.Model):
     def value(self, value):
         cipher_suite = Fernet(settings.ENCRIPTION_KEY.encode())
         self.encrypted_value = cipher_suite.encrypt(value.encode())
+
+
+class DateFiedsMixing(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True

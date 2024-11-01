@@ -9,6 +9,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
+from authentication.utils.db_utils import get_user_profile_path
+
 
 # Create your models here.
 phone_validator = RegexValidator(
@@ -84,6 +86,10 @@ class CustomUser(AbstractUser):
 
     # the deleted attribute
     is_deleted = models.BooleanField(default=False)
+
+    profile = models.ImageField(
+        upload_to=get_user_profile_path, null=True, blank=True
+    )
 
     objects = NonDeletedManager()
 

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     #documentation
     'drf_yasg', # swagger
     "corsheaders", # cors
+    "treebeard", # treebeard
 ]
 
 MIDDLEWARE = [
@@ -223,3 +224,7 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+
+########################## WHERE TO STORE MEDIA FILES ##########################
+USER_PROFILE_FOLDER = "user_profiles"
