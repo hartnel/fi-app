@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'drf_yasg', # swagger
     "corsheaders", # cors
     "treebeard", # treebeard
+    "django_filters", # django filters
 ]
 
 MIDDLEWARE = [
