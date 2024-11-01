@@ -11,3 +11,4 @@ django-cors-headers==4.4.0
 celery==5.4.0
 gevent==24.2.1
 django-treebeard==4.7.1
+Pillow==10.4.0

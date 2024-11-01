@@ -1,12 +1,15 @@
 from rest_framework.viewsets import ModelViewSet
-
+from sectors.models import SectorType, Sector
+from .serializers import SectorTypeSerializer , SectorSerializer
 # Create your views here.
 
 #create a model view for sector and sector type
 
 class SectorTypeViewSet(ModelViewSet):
-    pass
+    queryset = SectorType.objects.all()
+    serializer_class = SectorTypeSerializer
 
 
 class SectorViewSet(ModelViewSet):
-    pass
+    queryset = Sector.objects.all()
+    serializer_class = SectorSerializer

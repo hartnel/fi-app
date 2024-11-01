@@ -171,6 +171,7 @@ class LoginSerializer(serializers.Serializer):
     
     
 class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = [
@@ -183,6 +184,11 @@ class UserSerializer(serializers.ModelSerializer):
             "email_is_verified",
             "profile",
         ]
+        
+    def get_profile(self, obj):
+        request = self.context.get("request")
+        if obj.profile:
+            return request.build_absolute_uri(obj.profile.url)
         
         
     

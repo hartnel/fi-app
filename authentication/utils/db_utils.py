@@ -21,9 +21,10 @@ def get_user_profile_path(instance, filename):
 
 def validate_profile_size(value):
     filesize = value.size
+    filesize_in_mb = filesize / (1024 * 1024)
     max_file_size = KeyManager.get(name="MAX_PROFILE_SIZE_MB" , default=5.0, value_type=float)
 
-    if filesize > max_file_size:
+    if filesize_in_mb > max_file_size:
         raise ValidationError(
             _("the max size of file is :{}MB").format(max_file_size)
         )

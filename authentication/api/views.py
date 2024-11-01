@@ -8,12 +8,15 @@ from authentication.utils.jwt_token import get_tokens_for_user
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db import transaction
+from rest_framework.parsers import MultiPartParser
 
 #Auth viewSet with swagger documentation
 class AuthViewSet(viewsets.ViewSet):
     """
     This viewset handles authentication related endpoints
     """
+    
+    #parser_classes = (MultiPartParser, )
     
     @swagger_auto_schema(
         request_body=SignupSerializer,
@@ -101,7 +104,7 @@ class AuthViewSet(viewsets.ViewSet):
         serializer = PhoneVerificationSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        data = UserSerializer(user).data
+        data = UserSerializer(user, context={"request" : request}).data
         jwt = get_tokens_for_user(user)
         data = {
             "user": data,
@@ -191,7 +194,7 @@ class AuthViewSet(viewsets.ViewSet):
         jwt = get_tokens_for_user(user)
         
         data = {
-            "user": UserSerializer(user).data,
+            "user": UserSerializer(user, context={"request" : request}).data,
             "tokens": jwt,
         }
         
@@ -227,11 +230,86 @@ class AuthViewSet(viewsets.ViewSet):
         
         """
         user = request.user
-        data = UserSerializer(user).data
+        data = UserSerializer(user, context={"request" : request}).data
         return Response(data, status=status.HTTP_200_OK)
     
 
-
+    
+    @swagger_auto_schema(
+        # request_body=openapi.Schema(
+        #     type=openapi.TYPE_OBJECT,
+        #     properties={
+        #         #first_name: "string",
+        #         #last_name: "string",
+        #         #profile: "file"
+                
+        #         #handle first_name
+        #         "first_name": openapi.Schema(
+        #             type=openapi.TYPE_STRING,
+        #             description="First name of the user",
+        #         ),
+                
+        #         #handle last_name
+        #         "last_name": openapi.Schema(
+        #             type=openapi.TYPE_STRING,
+        #             description="Last name of the user",
+        #         ),
+                
+        #         #handle profile+
+        #         "profile": openapi.Schema(
+        #             type=openapi.TYPE_FILE,
+        #             description="Profile picture of the user",
+        #         ),
+        #     },
+        #     required=[],
+            
+        # ),
+        request_body = UpdateUserSerializer,
+        method="PUT",
+        manual_parameters=[
+            openapi.Parameter(
+                name="first_name",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_STRING,
+                description="First name of the user",
+                required=False,
+            ),
+            openapi.Parameter(
+                name="last_name",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_STRING,
+                description="Last name of the user",
+                required=False,
+            ),
+            openapi.Parameter(
+                name="profile",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_FILE,
+                description="Profile picture of the user",
+                required=False,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    field: openapi.Schema(type=openapi.TYPE_STRING)  # Adjust type as needed
+                    for field in UserSerializer().fields
+                },
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
+        },
+        tags=['Authentication'],
+    )
+    @action(
+        methods=["PUT"],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path="update_user",
+        url_name="update_user",
+        parser_classes=(MultiPartParser,)
+    )
+    @transaction.atomic
     def update_user(self, request):
         """
         This endpoint is used to update the current user
@@ -243,7 +321,7 @@ class AuthViewSet(viewsets.ViewSet):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            data = UserSerializer(user).data
+            data = UserSerializer(user, context={"request" : request}).data
             return Response(data, status=status.HTTP_200_OK)
 
         
