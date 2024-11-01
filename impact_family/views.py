@@ -9,6 +9,8 @@ from impact_family.serializers import FiSerializer, MinimalFiSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from django_filters import rest_framework as filters
+from .filters import MinimalFIListFilter
 
 class FIViewSet(ModelViewSet):
     queryset = Fi.objects.all()
@@ -16,15 +18,12 @@ class FIViewSet(ModelViewSet):
     pagination_class = CustomPagination
     
     
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], filter_backends=(filters.DjangoFilterBackend,), filterset_class=MinimalFIListFilter)
     def minimal_search(self, request):
         """
         This method is used to search for a family instance
         """
-        name = request.query_params.get('name')
-        queryset = Fi.objects.all()
-        if name:
-            queryset = queryset.filter(name__icontains=name)
+        queryset = self.filter_queryset(self.get_queryset())
             
         #paginate
         page = self.paginate_queryset(queryset)
