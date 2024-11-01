@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 from common.api import CustomPagination
 from impact_family.constants import FICts
 from impact_family.models import Fi, FiMemberShip
-from impact_family.serializers import FiSerializer, MinimalFiSerializer
+from impact_family.serializers import FiSerializer, MinimalFiSerializer,DetailedFiSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -23,6 +23,12 @@ class FIViewSet(ModelViewSet):
     pagination_class = CustomPagination
     
     
+    
+    def get_serializer_class(self):
+        #for retrieve method, use DetailedFiSerializer
+        if self.action == 'retrieve':
+            return DetailedFiSerializer
+        return FiSerializer
     
     #get queryset
     def get_queryset(self):

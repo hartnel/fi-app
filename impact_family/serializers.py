@@ -123,3 +123,14 @@ class FiSerializer(serializers.ModelSerializer):
         dist = round(dist, 2)
         
         return dist
+    
+
+class DetailedFiSerializer(FiSerializer):
+    """
+    This class represent a detailed serializer for the family instance
+    
+    """
+    
+    def get_sectors_path(self, obj:Fi):
+        sectors = obj.sector.get_ancestors(include_self=True)
+        return [{"id": sector.id, "label": sector.label, "type" : sector.type.name} for sector in sectors]
