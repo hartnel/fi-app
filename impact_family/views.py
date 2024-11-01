@@ -14,6 +14,8 @@ from django_filters import rest_framework as filters
 from .filters import MinimalFIListFilter
 from django.db.models.query import QuerySet
 from django.db.models import Prefetch
+from django.contrib.gis.geos.point import Point
+from django.contrib.gis.db.models.functions import Distance
 
 class FIViewSet(ModelViewSet):
     queryset = Fi.objects.all()
@@ -31,10 +33,30 @@ class FIViewSet(ModelViewSet):
         #prefetch related members
         base_queryset = base_queryset.prefetch_related(Prefetch('pilots'))
         
+        #if position_lat and position_lon is provided in the query params
+        #filter by distance
+        position_lat = self.request.query_params.get('position_lat')
+        position_lon = self.request.query_params.get('position_lon')
+        
+
+        position_lat = float(position_lat) if position_lat else None
+        position_lon = float(position_lon) if position_lon else None
+        
+        if position_lat and position_lon:
+            position = Point(position_lon, position_lat , srid=FICts.DEFAULT_SRID)
+            
+            #annotate by distance_to_join
+            base_queryset = base_queryset.annotate(distance_to_join=Distance('location__location', position))
+            
+            #order by distance
+            base_queryset = base_queryset.order_by('distance_to_join')
+            
+        else:
+            base_queryset = base_queryset.order_by('name')
+            
+        
         return base_queryset
-    
-    
-    #overide get method to take account of the filter
+
     
     
     @action(detail=False, methods=['get'])

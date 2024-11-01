@@ -26,3 +26,7 @@ class FICts:
         (PILOT, "PILOT"),
         (CO_PILOT, "CO_PILOT"),
     )
+    
+    WGS84 = 4326  # unit degree https://epsg.io/4326
+    WGS84_METRE = 32643  # unit metre https://epsg.io/32643
+    DEFAULT_SRID = WGS84

@@ -105,6 +105,7 @@ class FiSerializer(serializers.ModelSerializer):
     sectors_path = serializers.SerializerMethodField()
     sector = MiniSectorSerializer()
     pilots = FiPilotSerializer(many=True)
+    distance_to_join = serializers.SerializerMethodField()
     
     class Meta:
         model = Fi
@@ -115,3 +116,6 @@ class FiSerializer(serializers.ModelSerializer):
         #only valid for childs
         sectors = obj.sector.get_ancestors(include_self=True)
         return [{"id": sector.id, "name": sector.name} for sector in sectors]
+    
+    def get_distance_to_join(self, obj:Fi):
+        return obj.distance_to_join.m if hasattr(obj, 'distance_to_join') else 0
