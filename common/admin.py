@@ -1,4 +1,3 @@
-from django.contrib import admin
 from common.key_manager import KeyManager
 from common.models import Location, Key
 from django import forms
