@@ -27,8 +27,8 @@ class MiniLocationSerializer(serializers.ModelSerializer):
         
     def get_location(self, obj:Location):
         return {
-            "lat" : obj.location.coords.y,
-            "lng" : obj.location.coords.x
+            "lat" : obj.location.coords[1],
+            "lng" : obj.location.coords[0]
         }
 
 class FiSerializer(serializers.ModelSerializer):
