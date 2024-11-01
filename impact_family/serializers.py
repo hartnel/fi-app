@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from churchs.models import Church
+from sectors.models import Sector
 from .models import Fi
 from common.models import Location
 
@@ -42,6 +43,16 @@ class MiniChurchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Church
         fields = ['id', 'name',]
+        
+class MiniSectorSerializer(serializers.ModelSerializer):
+    """
+    This class represent a minimal serializer for the sector
+    
+    """
+    
+    class Meta:
+        model = Sector
+        fields = ['id', 'label',]
 
 class FiSerializer(serializers.ModelSerializer):
     """
@@ -51,7 +62,15 @@ class FiSerializer(serializers.ModelSerializer):
     
     location = MiniLocationSerializer()
     church = MiniChurchSerializer()
+    sectors_path = serializers.SerializerMethodField()
+    sector = MiniSectorSerializer()
     
     class Meta:
         model = Fi
         fields = '__all__'
+        
+    def get_sectors_path(self, obj:Fi):
+        return []
+        #only valid for childs
+        sectors = obj.sector.get_ancestors(include_self=True)
+        return [{"id": sector.id, "name": sector.name} for sector in sectors]
