@@ -18,13 +18,17 @@ class Fi(models.Model):
     sector = models.ForeignKey(Sector, on_delete=models.SET_NULL , null=True, blank=True)
     church = models.ForeignKey(Church, on_delete=models.SET_NULL , null=True, blank=True)
     
-    
+    def __str__(self) -> str:
+        return self.name
     
 
 class FiPilots(models.Model):
     fi = models.ForeignKey(Fi, on_delete=models.CASCADE, related_name='pilots')
     name = models.CharField(max_length=255)
     phones = ArrayField(models.CharField(max_length=15))
+    
+    def __str__(self) -> str:
+        return self.name
 
 class FiMemberShip(models.Model):
     fi = models.ForeignKey(Fi, on_delete=models.CASCADE, related_name='members')
