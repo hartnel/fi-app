@@ -2,6 +2,7 @@ from django.contrib import admin
 from common.key_manager import KeyManager
 from common.models import Location, Key
 from django import forms
+from django.contrib.gis import admin
 # Register your models here.
 
 
@@ -37,5 +38,5 @@ class KeyAdmin(admin.ModelAdmin):
             KeyManager.update(obj.id, name, value)
 
 
-admin.site.register([Location,])
+admin.site.register([Location, admin.OSMGeoAdmin])
 admin.site.register(Key, KeyAdmin)
