@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from churchs.models import Church
 from .models import Fi
 from common.models import Location
 
@@ -30,6 +32,16 @@ class MiniLocationSerializer(serializers.ModelSerializer):
             "lat" : obj.location.coords[1],
             "lng" : obj.location.coords[0]
         }
+        
+class MiniChurchSerializer(serializers.ModelSerializer):
+    """
+    This class represent a minimal serializer for the church
+    
+    """
+    
+    class Meta:
+        model = Church
+        fields = ['id', 'name',]
 
 class FiSerializer(serializers.ModelSerializer):
     """
@@ -38,6 +50,7 @@ class FiSerializer(serializers.ModelSerializer):
     """
     
     location = MiniLocationSerializer()
+    church = MiniChurchSerializer()
     
     class Meta:
         model = Fi
