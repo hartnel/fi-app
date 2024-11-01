@@ -110,7 +110,9 @@ class AdditionalPhoneNumber(models.Model):
         validators=[phone_validator],
     )
     
-    type = models.CharField(max_length=120, blank=False, null=False, choices=AdditionalPhoneNumberCts.PHONE_NUMBER_TYPE_CHOICES, default=AdditionalPhoneNumberCts.NORMAL)
+    is_whatapp = models.BooleanField(default=False)
+    
+    is_simple = models.BooleanField(default=True)
     
     is_verified = models.BooleanField(default=False)
     

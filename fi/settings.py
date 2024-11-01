@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "authentication",
     "common",
     "sectors",
+    "churchs",
+    "impact_family",
     
     #documentation
     'drf_yasg', # swagger

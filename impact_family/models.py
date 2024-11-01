@@ -14,7 +14,7 @@ class Fi(models.Model):
     type = models.CharField(max_length=10, choices=FICts.FI_TYPE_CHOICES, default=FICts.FI)
     name = models.CharField(max_length=255)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL , null=True, blank=True)
-    sector = models.ForeignKey(Sector , on_delete=models.SET_NULL , null=True, blank=True)
+    sector = models.ForeignKey(Sector, on_delete=models.SET_NULL , null=True, blank=True)
     church = models.ForeignKey(Church, on_delete=models.SET_NULL , null=True, blank=True)
     
     
