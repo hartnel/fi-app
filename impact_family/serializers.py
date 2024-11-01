@@ -133,4 +133,6 @@ class DetailedFiSerializer(FiSerializer):
     
     def get_sectors_path(self, obj:Fi):
         sectors = obj.sector.get_ancestors()
+        #add self sector
+        sectors = list(sectors) + [obj.sector]
         return [{"id": sector.id, "label": sector.label, "type" : sector.type.name} for sector in sectors]
