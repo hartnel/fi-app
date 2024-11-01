@@ -118,4 +118,8 @@ class FiSerializer(serializers.ModelSerializer):
         return [{"id": sector.id, "name": sector.name} for sector in sectors]
     
     def get_distance_to_join(self, obj:Fi):
-        return obj.distance_to_join.m if hasattr(obj, 'distance_to_join') else 0
+        dist =  obj.distance_to_join.m if hasattr(obj, 'distance_to_join') else 0
+        #round to 2 decimal places
+        dist = round(dist, 2)
+        
+        return dist
