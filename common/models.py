@@ -9,6 +9,9 @@ class Location(models.Model):
     label = models.TextField(null=True, blank=True)
     location = models.PointField(srid=GeoCts.DEFAULT_SRID)
     
+    def __str__(self):
+        return self.label
+    
 
 
 class Key(models.Model):
