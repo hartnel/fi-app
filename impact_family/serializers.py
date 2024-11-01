@@ -2,8 +2,11 @@ from rest_framework import serializers
 
 from churchs.models import Church
 from sectors.models import Sector
-from .models import Fi
+from .models import Fi, FiPilots
 from common.models import Location
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class MinimalFiSerializer(serializers.ModelSerializer):
@@ -53,6 +56,43 @@ class MiniSectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sector
         fields = ['id', 'label',]
+        
+class MemberShipSerializer(serializers.ModelSerializer):
+    """
+    This class represent a serializer for the family instance membership
+    
+    """
+    
+    user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Fi
+        fields = '__all__'
+        
+    def get_user(self, obj:Fi):
+        additional_phones = obj.user.additional_phone_numbers.filter(is_verified=True)
+        return {
+            "id" : obj.user.id,
+            "first_name" : obj.user.first_name,
+            "last_name" : obj.user.last_name,
+            "phones" : [
+                {
+                    "phone" : phone.phone_number,
+                    "is_whatsapp" : phone.is_whatapp,
+                    "is_simple" : phone.is_simple,
+                }
+                for phone in additional_phones
+            ]
+        }
+        
+class FiPilotSerializer(serializers.ModelSerializer):
+    """
+    This class represent a
+    """
+    
+    class Meta:
+        model = FiPilots
+        fields = ("name", "phones")
 
 class FiSerializer(serializers.ModelSerializer):
     """
@@ -64,6 +104,7 @@ class FiSerializer(serializers.ModelSerializer):
     church = MiniChurchSerializer()
     sectors_path = serializers.SerializerMethodField()
     sector = MiniSectorSerializer()
+    pilots = FiPilotSerializer(many=True)
     
     class Meta:
         model = Fi

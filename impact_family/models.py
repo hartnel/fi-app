@@ -7,6 +7,7 @@ from common.models import Location
 from sectors.models import Sector
 from churchs.models import Church
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import ArrayField
 
 User = get_user_model()
 
@@ -19,12 +20,17 @@ class Fi(models.Model):
     
     
     
-    
+
+class FiPilots(models.Model):
+    fi = models.ForeignKey(Fi, on_delete=models.CASCADE, related_name='pilots')
+    name = models.CharField(max_length=255)
+    phones = ArrayField(models.CharField(max_length=15))
+
 class FiMemberShip(models.Model):
-    fi = models.ForeignKey(Fi, on_delete=models.CASCADE)
+    fi = models.ForeignKey(Fi, on_delete=models.CASCADE, related_name='members')
     role  = models.CharField(max_length=10, choices=FICts.FI_ROLE_CHOICES, default=FICts.MEMBER)
     role_is_validated = models.BooleanField(default=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fi_membership')
     
     
     
