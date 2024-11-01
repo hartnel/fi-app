@@ -8,3 +8,9 @@ class MinimalFIListFilter(filters.FilterSet):
     class Meta:
         model = Fi
         fields = ['name', ]
+        
+        
+class FIListFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr='icontains')
+    type = filters.CharFilter(field_name="type", lookup_expr='icontains')
+    

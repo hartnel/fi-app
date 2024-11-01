@@ -3,4 +3,4 @@ from authentication.models import *
 
 # Register your models here.
 
-admin.site.register([CustomUser, OTPToken])
+admin.site.register([CustomUser, OTPToken , AdditionalPhoneNumber])
