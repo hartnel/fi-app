@@ -37,5 +37,6 @@ class KeyAdmin(admin.ModelAdmin):
             KeyManager.update(obj.id, name, value)
 
 
-admin.site.register([Location, admin.OSMGeoAdmin])
+
+admin.site.register(Location, admin.OSMGeoAdmin)
 admin.site.register(Key, KeyAdmin)
