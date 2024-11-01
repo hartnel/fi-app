@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from authentication.api.serializers import SignupSerializer, LoginSerializer, PhoneVerificationSerializer, UserSerializer, ResendPhoneVerificationSerializer
+from authentication.api.serializers import SignupSerializer, LoginSerializer, PhoneVerificationSerializer, UpdateUserSerializer, UserSerializer, ResendPhoneVerificationSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
@@ -229,6 +229,23 @@ class AuthViewSet(viewsets.ViewSet):
         user = request.user
         data = UserSerializer(user).data
         return Response(data, status=status.HTTP_200_OK)
+    
+
+
+    def update_user(self, request):
+        """
+        This endpoint is used to update the current user
+        """
+        user = request.user
+        serializer = UpdateUserSerializer(
+            data=request.data, instance=user, partial=True, context={"request": request},
+        )
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            data = UserSerializer(user).data
+            return Response(data, status=status.HTTP_200_OK)
+
         
         
         

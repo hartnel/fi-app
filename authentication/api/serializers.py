@@ -2,6 +2,7 @@ from rest_framework import serializers
 from authentication.constants import RegexCts, TokenCts
 from django.contrib.auth import get_user_model
 
+from authentication.utils.db_utils import validate_profile_size
 from authentication.utils.otp import clear_otps, generate_and_save_otp_for, regenerate_otp, verify_code
 
 User = get_user_model()
@@ -180,7 +181,37 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "phone_is_verified",
             "email_is_verified",
+            "profile",
         ]
         
         
     
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    """
+    This class is for partial update an user
+    """
+
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    profile = serializers.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "profile",
+        ]
+
+
+    def validate_profile(self, value):
+        #validate the size of the image
+        validate_profile_size(value)
+        return value
+    
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

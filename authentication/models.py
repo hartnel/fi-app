@@ -9,7 +9,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
-from authentication.utils.db_utils import get_user_profile_path
+from authentication.utils.db_utils import get_user_profile_path, validate_profile_size
 
 
 # Create your models here.
@@ -88,7 +88,7 @@ class CustomUser(AbstractUser):
     is_deleted = models.BooleanField(default=False)
 
     profile = models.ImageField(
-        upload_to=get_user_profile_path, null=True, blank=True
+        upload_to=get_user_profile_path, null=True, blank=True, validators=[validate_profile_size]
     )
 
     objects = NonDeletedManager()
