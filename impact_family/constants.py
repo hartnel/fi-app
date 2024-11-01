@@ -20,3 +20,9 @@ class FICts:
         (CO_PILOT, "CO_PILOT"),
         (MEMBER, "MEMBER"),
     )
+    
+    ADMIN_FI_ROLE_CHOICES = (
+        (HOST, "HOST"),
+        (PILOT, "PILOT"),
+        (CO_PILOT, "CO_PILOT"),
+    )

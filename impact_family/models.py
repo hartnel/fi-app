@@ -26,6 +26,8 @@ class FiPilots(models.Model):
     fi = models.ForeignKey(Fi, on_delete=models.CASCADE, related_name='pilots')
     name = models.CharField(max_length=255)
     phones = ArrayField(models.CharField(max_length=15))
+    role = models.CharField(max_length=10, choices=FICts.ADMIN_FI_ROLE_CHOICES, default=FICts.PILOT)
+    
     
     def __str__(self) -> str:
         return self.name
