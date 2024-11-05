@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     "django_filters", # django 
     "crispy_forms", # crispy_forms
     "crispy_bootstrap4", # crispy_bootstrap4
+    "dal",
+    "dal_select2",
 ]
 
 MIDDLEWARE = [
