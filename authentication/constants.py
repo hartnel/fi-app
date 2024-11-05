@@ -30,3 +30,13 @@ class TokenCts:
     )
     
     TOKEN_TYPES_AS_LIST = [t[0] for t in TOKEN_TYPES]
+    
+    
+class AuthCts:
+    MALE = "M"
+    FEMALE = "F"
+    
+    SEX_CHOICES = (
+        (MALE, MALE),
+        (FEMALE, FEMALE),
+    )

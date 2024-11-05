@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from authentication.constants import AuthCts
 from authentication.utils.jwt_token import get_tokens_for_user
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -279,6 +280,15 @@ class AuthViewSet(viewsets.ViewSet):
                 in_=openapi.IN_FORM,
                 type=openapi.TYPE_STRING,
                 description="Last name of the user",
+                required=False,
+            ),
+            #sex
+            openapi.Parameter(
+                name="sex",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_STRING,
+                choices=AuthCts.SEX_CHOICES,
+                description="The sex of the user",
                 required=False,
             ),
             openapi.Parameter(

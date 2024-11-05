@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from authentication.constants import RegexCts, TokenCts
+from authentication.constants import AuthCts, RegexCts, TokenCts
 from django.contrib.auth import get_user_model
 
 from authentication.utils.db_utils import validate_profile_size
@@ -201,6 +201,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     profile = serializers.ImageField(required=False)
+    sex = serializers.ChoiceField(choices=AuthCts.SEX_CHOICES, required=False)
+    date_of_birth = serializers.DateField(required=False)
 
     class Meta:
         model = User
@@ -208,6 +210,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "profile",
+            "sex",
+            "date_of_birth",
         ]
 
 

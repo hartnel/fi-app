@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
-from authentication.constants import AdditionalPhoneNumberCts, RegexCts, TokenCts
+from authentication.constants import AdditionalPhoneNumberCts, AuthCts, RegexCts, TokenCts
 from django.utils.timezone import now
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -90,6 +90,10 @@ class CustomUser(AbstractUser):
     profile = models.ImageField(
         upload_to=get_user_profile_path, null=True, blank=True, validators=[validate_profile_size]
     )
+    
+    sex = models.CharField(max_length=10, choices=AuthCts.SEX_CHOICES, null=True, blank=True)
+    
+    date_of_birth = models.DateField(null=True, blank=True)
 
     objects = NonDeletedManager()
 
