@@ -58,7 +58,9 @@ INSTALLED_APPS = [
     'drf_yasg', # swagger
     "corsheaders", # cors
     "treebeard", # treebeard
-    "django_filters", # django filters
+    "django_filters", # django 
+    "crispy_forms", # crispy_forms
+    "crispy_bootstrap4", # crispy_bootstrap4
 ]
 
 MIDDLEWARE = [
@@ -232,3 +234,6 @@ SWAGGER_SETTINGS = {
 
 ########################## WHERE TO STORE MEDIA FILES ##########################
 USER_PROFILE_FOLDER = "user_profiles"
+
+#CRISPY FORMS
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -13,3 +13,5 @@ gevent==24.2.1
 django-treebeard==4.7.1
 Pillow==10.4.0
 django-filter==24.3
+django-crispy-forms==2.3
+crispy-bootstrap4==2024.10
