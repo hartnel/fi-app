@@ -183,6 +183,8 @@ class UserSerializer(serializers.ModelSerializer):
             "phone_is_verified",
             "email_is_verified",
             "profile",
+            "sex",
+            "date_of_birth",
         ]
         
     def get_profile(self, obj):
