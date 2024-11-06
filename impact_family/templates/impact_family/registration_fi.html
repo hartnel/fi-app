@@ -29,7 +29,7 @@
                         </ul>
                     </div>
                 {% endif %}
-                <form action="" method="POST" id="fi_form">
+                <form action="" method="POST" id="fi_form" data-sectors-url="{% url 'ajax_load_sectors' %}" data-fis-url="{% url 'ajax_load_fis' %}" data-fis-infos-url="{% url 'ajax_load_fi_infos' %}">
                     {% csrf_token %}
                     {{ form | crispy }}
                     <div class="text-center">
@@ -57,18 +57,12 @@
     function initAutoCompletes(){
 
         //sector autocomplete
-        $('#id_sector').autocomplete({
-            source: "{% url 'sector-autocomplete' %}",
-            minLength: 2,
-            open: function () {
-                setTimeout(function () {
-                    $('.ui-autocomplete').css('z-index', 99);
-                }, 0);
-            }
-        });
+        
     }
 
     function getLocation(){
+        //clear the id_gps_position field
+        $('#id_gps_position').val('');
 
         if(navigator.geolocation)
         {
@@ -91,12 +85,77 @@
         alert("Error getting Gps " + event.code + ". " + event.message);
     }
 
+
+    function auto_fill_sectors(){
+        $("#id_city").change(function () {
+            var url = $("#fi_form").attr("data-sectors-url");  // get the url of the `load_cities` view
+            var cityId = $(this).val();  // get the selected country ID from the HTML input
+      
+            $.ajax({                       // initialize an AJAX request
+              url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+              data: {
+                'city': cityId       // add the country id to the GET parameters
+              },
+              success: function (data) {   // `data` is the return of the `load_cities` view function
+                $("#id_sector").html(data);  // replace the contents of the city input with the data that came from the server
+              }
+            });
+      
+          });
+    }
+
+    function auto_fill_fis(){
+        $("#id_sector").change(function () {
+            var url = $("#fi_form").attr("data-fis-url");  // get the url of the `load_cities` view
+            var sectorId = $(this).val();  // get the selected country ID from the HTML input
+      
+            $.ajax({                       // initialize an AJAX request
+              url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+              data: {
+                'sector': sectorId       // add the country id to the GET parameters
+              },
+              success: function (data) {   // `data` is the return of the `load_cities` view function
+                $("#id_fi").html(data);  // replace the contents of the city input with the data that came from the server
+              }
+            });
+      
+          });
+    }
+
+    function auto_fill_fis_infos(){
+        $("#id_fi").change(function () {
+            var url = $("#fi_form").attr("data-fis-infos-url");  // get the url of the `load_cities` view
+            var fiId = $(this).val();  // get the selected country ID from the HTML input
+      
+            $.ajax({                       // initialize an AJAX request
+              url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+              data: {
+                'fi': fiId       // add the country id to the GET parameters
+              },
+              success: function (data) {   // `data` is the return of the `load_cities` view function
+                //data is json
+                console.log(data);
+                //fill quater
+                $("#id_quater").val(data.quater);
+                //fill gps position
+                $("#id_gps_position").val(data.gps_position);
+                //fill description
+                $("#id_description_to_join_fi").val(data.description_to_join_fi);
+              }
+            });
+      
+          });
+
+    }
+
     
 
 
     function init(){
         //initAutoCompletes();
-       
+        auto_fill_sectors();
+        auto_fill_fis();
+        auto_fill_fis_infos();
     }
 
     $(document).ready(function(){

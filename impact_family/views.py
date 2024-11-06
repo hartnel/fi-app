@@ -13,6 +13,8 @@ from common.models import Location
 from django.http import HttpResponse
 from django.contrib.gis.geos.point import Point
 from django.db import transaction
+#import JsonResponse
+from django.http import JsonResponse
 # Create your views here.
 
 class RegisterFiView(TemplateView):
@@ -32,18 +34,10 @@ class RegisterFiView(TemplateView):
             
             if form.is_valid():
                 #do something
-                name = form.cleaned_data['name']
-                type = form.cleaned_data['type']
-                church = form.cleaned_data['church']
-                sector:Sector = form.cleaned_data['sector']
                 quater = form.cleaned_data['quater']
                 description_to_join_fi = form.cleaned_data['description_to_join_fi']
-                pilot_name = form.cleaned_data['pilot_name']
-                pilot_numbers = form.cleaned_data['pilot_numbers']
-                co_pilot_name = form.cleaned_data['co_pilot_name']
-                co_pilot_numbers = form.cleaned_data['co_pilot_numbers']
-                host_name = form.cleaned_data['host_name']
-                host_numbers = form.cleaned_data['host_numbers']
+                fi:Fi = form.cleaned_data['fi']
+                sector:Sector = form.cleaned_data['sector']
                 gps_position = form.cleaned_data['gps_position']
                 
                 gps_positions = gps_position.split(',')
@@ -51,43 +45,24 @@ class RegisterFiView(TemplateView):
                 long = float(gps_positions[1])
                 position = Point(long, lat , srid=FICts.DEFAULT_SRID)
                 
+                #delete old location
+                if fi.location:
+                    fi.location.delete()
+                
                 location = Location.objects.create(
                     location=position,
                     label=description_to_join_fi
                 )
-                    
                 
-                fi = Fi.objects.create(
-                    name=name,
-                    type=type,
-                    sector=sector,
-                    church=church,
-                    location=location,
-                )
-                
-                if pilot_name:
-                    pilot = fi.pilots.create(
-                        name=pilot_name,
-                        phones=pilot_numbers if pilot_numbers else [],
-                        role=FICts.PILOT
-                    )
-                    
-                if co_pilot_name:
-                    co_pilot = fi.pilots.create(
-                        name=co_pilot_name,
-                        phones=co_pilot_numbers if co_pilot_numbers else [],
-                        role=FICts.CO_PILOT
-                    )
-                    
-                if host_name:
-                    host = fi.pilots.create(
-                        name=host_name,
-                        phones=host_numbers if host_numbers else [],
-                        role=FICts.HOST
-                    )
+                fi.location = location
+                fi.sector = sector
+                fi.save()
                     
                 #create quartier
                 if quater:
+                    #delete old quater
+                    if fi.quater:
+                        fi.quater.delete()
                     type,_ = SectorType.objects.get_or_create(
                         name=SectorTypeCts.QUATER
                     )
@@ -105,3 +80,51 @@ class RegisterFiView(TemplateView):
                 return HttpResponse("formulaire enregistré. Merci")
             
             return render(request, self.template_name, {'form': form})
+        
+        
+
+def load_sectors(request):
+    city_id = request.GET.get('city')
+    parent_sector = Sector.objects.filter(pk=city_id).first()
+    if parent_sector:
+        sectors = parent_sector.get_children().filter(type__name=SectorTypeCts.SECTOR).order_by('label')
+    else:
+        sectors = Sector.objects.none()
+    return render(request, 'impact_family/sector_dropdown_list_options.html', {'sectors': sectors})
+
+
+
+def load_fis(request):
+    sector_id = request.GET.get('sector')
+    sector = Sector.objects.filter(pk=sector_id).first()
+    if sector:
+        fis = Fi.objects.filter(sector=sector).order_by('name')
+    else:
+        fis = Fi.objects.none()
+    return render(request, 'impact_family/fi_dropdown_list_options.html', {'fis': fis})
+
+
+def load_fi_infos(request):
+    fi_id = request.GET.get('fi')
+    fi = Fi.objects.filter(pk=fi_id).first()
+    if fi:
+        quater = fi.quater.label if fi.quater else ''
+        description_to_join_fi = fi.location.label if fi.location else ''
+        gps_position = ''
+        if fi.location:
+            lat = fi.location.location.y
+            long = fi.location.location.x
+            gps_position = f'{lat},{long}'
+    else:
+        quater = ''
+        description_to_join_fi = ''
+        gps_position = ''
+    
+    data = {
+        'quater': quater,
+        'description_to_join_fi': description_to_join_fi,
+        'gps_position': gps_position
+    }
+    
+    #return as json
+    return JsonResponse(data)
