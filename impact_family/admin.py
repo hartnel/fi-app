@@ -1,5 +1,8 @@
 from django.contrib import admin
 
+from sectors.constants import SectorTypeCts
+from sectors.models import Sector
+
 # Register your models here.
 
 from .models import Fi, FiMemberShip, FiPilots
@@ -24,6 +27,12 @@ class PilotsInline(admin.StackedInline):
     
 class FiAdmin(admin.ModelAdmin):
     inlines = [PilotsInline]
+    
+    #filter sectors before show
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'sector':
+            kwargs['queryset'] = Sector.objects.filter(type__name=SectorTypeCts.SECTOR)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     
     
 admin.site.register(Fi, FiAdmin)
