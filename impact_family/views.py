@@ -86,11 +86,14 @@ class RegisterFiView(TemplateView):
 def load_sectors(request):
     city_id = request.GET.get('city')
     parent_sector = Sector.objects.filter(pk=city_id).first()
+    auto_select = False
     if parent_sector:
         sectors = parent_sector.get_children().filter(type__name=SectorTypeCts.SECTOR).order_by('label')
+        if sectors.count() == 1:
+            auto_select = True
     else:
         sectors = Sector.objects.none()
-    return render(request, 'impact_family/sector_dropdown_list_options.html', {'sectors': sectors})
+    return render(request, 'impact_family/sector_dropdown_list_options.html', {'sectors': sectors , 'auto_select': auto_select})
 
 
 
