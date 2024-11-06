@@ -40,6 +40,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    "dal",
+    "dal_select2",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,8 +63,7 @@ INSTALLED_APPS = [
     "django_filters", # django 
     "crispy_forms", # crispy_forms
     "crispy_bootstrap4", # crispy_bootstrap4
-    "dal",
-    "dal_select2",
+    
 ]
 
 MIDDLEWARE = [

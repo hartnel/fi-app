@@ -3,7 +3,7 @@ from rest_framework import routers
 from impact_family.api.views import FIViewSet
 from impact_family.views import RegisterFiView, load_fis , load_sectors,load_fi_infos
 from django.urls import path,re_path
-from impact_family.autocomplete import SectorAutocomplete,ChurchAutocomplete
+from impact_family.autocomplete import FiAutocomplete, SectorAutocomplete,ChurchAutocomplete
 
 router = routers.SimpleRouter()
 
@@ -21,6 +21,11 @@ urlpatterns = [
     #     ChurchAutocomplete.as_view(),
     #     name="church-autocomplete",
     # ),
+    re_path(
+        r"^fi-autocomplete/$",
+        FiAutocomplete.as_view(create_field="name"),
+        name="fi-autocomplete",
+    ),
     path("register-fi/", RegisterFiView.as_view(), name="register-fi"),
     path('ajax/load-sectors/', load_sectors, name='ajax_load_sectors'),
     path('ajax/load-fis/', load_fis, name='ajax_load_fis'),

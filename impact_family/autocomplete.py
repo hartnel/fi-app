@@ -1,5 +1,6 @@
 from dal import autocomplete
 from churchs.models import Church
+from impact_family.models import Fi
 from sectors.models import Sector
 
 class SectorAutocomplete(autocomplete.Select2QuerySetView):
@@ -28,3 +29,17 @@ class ChurchAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(name__istartswith=self.q)
 
         return qs
+    
+    
+class FiAutocomplete(autocomplete.Select2QuerySetView):
+    #this can create Fi on runtime
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        qs = Fi.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
+    
+    

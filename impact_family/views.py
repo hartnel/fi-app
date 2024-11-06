@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 class RegisterFiView(TemplateView):
     template_name = 'impact_family/registration_fi.html'
     
-    
+    @csrf_exempt
     def get(self, request, *args, **kwargs):
         
         form = RegistrationForm()        
@@ -42,11 +42,21 @@ class RegisterFiView(TemplateView):
                 fi:Fi = form.cleaned_data['fi']
                 sector:Sector = form.cleaned_data['sector']
                 gps_position = form.cleaned_data['gps_position']
+                pilot_name = form.cleaned_data['pilot_name']
+                pilot_phones = form.cleaned_data['pilot_phones']
+                host_name = form.cleaned_data['host_name']
+                host_phones = form.cleaned_data['host_phones']
+                fi_name = form.cleaned_data['fi_name']
                 
                 gps_positions = gps_position.split(',')
                 lat = float(gps_positions[0])
                 long = float(gps_positions[1])
                 position = Point(long, lat , srid=FICts.DEFAULT_SRID)
+                
+                if not fi:
+                    fi = Fi.objects.create(
+                        name=fi_name
+                    )
                 
                 #delete old location
                 if fi.location:
@@ -77,7 +87,24 @@ class RegisterFiView(TemplateView):
                     fi.quater = quater_obj
                     fi.save()
                     
-                            
+                #create pilot
+                if pilot_name:
+                    #delete pilot
+                    fi.pilots.filter(role=FICts.PILOT).delete()
+                    fi.pilots.create(
+                        name=pilot_name,
+                        phones=pilot_phones,
+                        role=FICts.PILOT
+                    )
+                    
+                if host_name:
+                    #delete host
+                    fi.pilots.filter(role=FICts.HOST).delete()
+                    fi.pilots.create(
+                        name=host_name,
+                        phones=host_phones,
+                        role=FICts.HOST
+                    )
                 
                 #return http response ("formulaire enregistré")
                 return HttpResponse("formulaire enregistré. Merci")
@@ -113,7 +140,9 @@ def load_fis(request):
 @csrf_exempt
 def load_fi_infos(request):
     fi_id = request.GET.get('fi')
-    fi = Fi.objects.filter(pk=fi_id).first()
+    fi = None
+    if fi_id and fi_id.isdigit():
+        fi = Fi.objects.filter(pk=fi_id).first()
     if fi:
         quater = fi.quater.label if fi.quater else ''
         description_to_join_fi = fi.location.label if fi.location else ''
@@ -122,15 +151,39 @@ def load_fi_infos(request):
             lat = fi.location.location.y
             long = fi.location.location.x
             gps_position = f'{lat},{long}'
+            
+        pilot = fi.pilots.filter(role=FICts.PILOT).first()
+        if pilot:
+            pilot_name = pilot.name
+            pilot_phones = ','.join(pilot.phones) if pilot.phones else ''
+        else:
+            pilot_name = ''
+            pilot_phones = ''
+            
+        host = fi.pilots.filter(role=FICts.HOST).first()
+        if host:
+            host_name = host.name
+            host_phones = ','.join(host.phones) if host.phones else ''
+        else:
+            host_name = ''
+            host_phones = ''
     else:
         quater = ''
         description_to_join_fi = ''
         gps_position = ''
+        pilot_name = ''
+        pilot_phones = ''
+        host_name = ''
+        host_phones = ''
     
     data = {
         'quater': quater,
         'description_to_join_fi': description_to_join_fi,
-        'gps_position': gps_position
+        'gps_position': gps_position,
+        'pilot_name': pilot_name,
+        'pilot_phones': pilot_phones,
+        'host_name': host_name,
+        'host_phones': host_phones
     }
     
     #return as json
