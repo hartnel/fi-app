@@ -27,7 +27,7 @@ class RegistrationForm(forms.Form):
     quater = forms.CharField(label='Entrez le quartier de votre Famille d\'impact ?', max_length=255)
     
     # field for gps location
-    gps_position = forms.CharField(label='Position GPS de votre famille d\impact. Cliquez pour que champ soit automatiquement rempli.', max_length=255, help_text="Cliquez pour que champ soit automatiquement rempli.", required=True, widget=forms.TextInput(attrs={'readonly': 'readonly' , 'onclick': 'getLocation()'}))
+    gps_position = forms.CharField(label='Position GPS de votre famille d\'impact. Cliquez pour que champ soit automatiquement rempli.', max_length=255, help_text="Cliquez pour que champ soit automatiquement rempli.", required=True, widget=forms.TextInput(attrs={'readonly': 'readonly' , 'onclick': 'getLocation()'}))
     
     #description_to_join_fi is a text field to describe how to join the FI
     description_to_join_fi = forms.CharField(label='Plus de precision par rapport à la localisation de votre FI', widget=forms.Textarea(attrs={'rows':4}), help_text="Description pour mieux localiser votre FI", required=True,)
