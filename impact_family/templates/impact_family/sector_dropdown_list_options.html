@@ -1,6 +1,8 @@
 <option value="">---------</option>
 {% if auto_select %}
-    <option value="{{ auto_select.pk }}" selected>{{ auto_select.label }}</option>
+    {% for sector in sectors %}
+        <option value="{{ sector.pk }}" selected>{{ sector.label }}</option>
+    {% endfor %}
 {% else %}
     {% for sector in sectors %}
         <option value="{{ sector.pk }}">{{ sector.label }}</option>
