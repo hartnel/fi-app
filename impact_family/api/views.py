@@ -32,7 +32,8 @@ class FIViewSet(ModelViewSet):
     
     #get queryset
     def get_queryset(self):
-        base_queryset:QuerySet = Fi.objects.all()
+        #filter has location
+        base_queryset:QuerySet = Fi.objects.all().exclude(location=None, sector=None, church=None)
         #select related church, location and sector
         base_queryset = base_queryset.select_related('church', 'location', 'sector')
         
