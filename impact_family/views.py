@@ -15,6 +15,8 @@ from django.contrib.gis.geos.point import Point
 from django.db import transaction
 #import JsonResponse
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 
 class RegisterFiView(TemplateView):
@@ -28,6 +30,7 @@ class RegisterFiView(TemplateView):
         return render(request, self.template_name, {'form': form})
     
     @transaction.atomic
+    @csrf_exempt
     def post(self, request, *args, **kwargs):
             
             form = RegistrationForm(request.POST)
@@ -82,7 +85,7 @@ class RegisterFiView(TemplateView):
             return render(request, self.template_name, {'form': form})
         
         
-
+@csrf_exempt
 def load_sectors(request):
     city_id = request.GET.get('city')
     parent_sector = Sector.objects.filter(pk=city_id).first()
@@ -96,7 +99,7 @@ def load_sectors(request):
     return render(request, 'impact_family/sector_dropdown_list_options.html', {'sectors': sectors , 'auto_select': auto_select})
 
 
-
+@csrf_exempt
 def load_fis(request):
     sector_id = request.GET.get('sector')
     sector = Sector.objects.filter(pk=sector_id).first()
@@ -107,6 +110,7 @@ def load_fis(request):
     return render(request, 'impact_family/fi_dropdown_list_options.html', {'fis': fis})
 
 
+@csrf_exempt
 def load_fi_infos(request):
     fi_id = request.GET.get('fi')
     fi = Fi.objects.filter(pk=fi_id).first()
