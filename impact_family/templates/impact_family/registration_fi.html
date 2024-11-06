@@ -15,8 +15,21 @@
             <div class="row mb-4">
             <div class="col lg-10 ml-2 mr-2">    
                 <h1 class="text-center mb-4">Enregistrement des FI</h1>
-        
-                <form action="" method="POST">
+                <h4 class="text-center mb-4">Veillez remplir ce formulaire une fois que vous êtes dans le lieu de la FI</h4>
+                {% comment %} if form has erors t {% endcomment %}
+                {% if form.errors %}
+                    <div class="alert alert-danger center">
+                        <strong>Erreur!</strong> Veuillez corriger les erreurs ci-dessous.
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <form action="" method="POST" id="fi_form">
                     {% csrf_token %}
                     {{ form | crispy }}
                     <div class="text-center">
@@ -39,6 +52,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.0/semantic.min.js"></script>
 </script> <script src="http://code.jquery.com/ui/1.12.0-rc.2/jquery-ui.js" ></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    function initAutoCompletes(){
+
+        //sector autocomplete
+        $('#id_sector').autocomplete({
+            source: "{% url 'sector-autocomplete' %}",
+            minLength: 2,
+            open: function () {
+                setTimeout(function () {
+                    $('.ui-autocomplete').css('z-index', 99);
+                }, 0);
+            }
+        });
+    }
+
+    function getLocation(){
+
+        if(navigator.geolocation)
+        {
+            navigator.geolocation.getCurrentPosition(onGeoSuccess,onGeoError);  
+        } else {
+            alert("Your browser or device doesn't support Geolocation");
+        }
+    }
+    
+    // If we have a successful location update
+    function onGeoSuccess(event){
+        let position = `${event.coords.latitude},${event.coords.longitude}`;
+
+        $('#id_gps_position').val(position);
+    }
+    
+    // If something has gone wrong with the geolocation request
+    function onGeoError(event){
+
+        alert("Error getting Gps " + event.code + ". " + event.message);
+    }
+
+    
+
+
+    function init(){
+        //initAutoCompletes();
+       
+    }
+
+    $(document).ready(function(){
+        init();
+    });
+
+    
+
+</script>
+
 
 </body>
 </html>

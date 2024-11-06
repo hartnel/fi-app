@@ -16,7 +16,9 @@ class Fi(models.Model):
     name = models.CharField(max_length=255)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL , null=True, blank=True)
     sector = models.ForeignKey(Sector, on_delete=models.SET_NULL , null=True, blank=True)
+    quater = models.ForeignKey(Sector, on_delete=models.SET_NULL , null=True, blank=True, related_name='fi_quater')
     church = models.ForeignKey(Church, on_delete=models.SET_NULL , null=True, blank=True)
+    saved_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self) -> str:
         return self.name
