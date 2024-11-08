@@ -135,4 +135,7 @@ class DetailedFiSerializer(FiSerializer):
         sectors = obj.sector.get_ancestors()
         #add self sector
         sectors = list(sectors) + [obj.sector]
+        #add the quater if exists
+        if obj.quater:
+            sectors.append(obj.quater)
         return [{"id": sector.id, "label": sector.label, "type" : sector.type.name} for sector in sectors]
