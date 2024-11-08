@@ -11,12 +11,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django_filters import rest_framework as filters
+from rest_framework.permissions import AllowAny
+from sectors.constants import SectorTypeCts
+from sectors.models import Sector
 from ..filters import MinimalFIListFilter
 from django.db.models.query import QuerySet
 from django.db.models import Prefetch
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.db.models.functions import Distance
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 class FIViewSet(ModelViewSet):
     queryset = Fi.objects.all()
     serializer_class = FiSerializer
@@ -44,6 +48,18 @@ class FIViewSet(ModelViewSet):
         #filter by distance
         position_lat = self.request.query_params.get('position_lat')
         position_lon = self.request.query_params.get('position_lon')
+        
+        entity_id = self.request.query_params.get('entity_id')
+        entity_type = self.request.query_params.get('entity_type')
+        
+        if entity_id and entity_type:
+            if entity_type == 'family':
+                base_queryset = base_queryset.filter(id=entity_id)
+            
+            elif entity_type == SectorTypeCts.QUATER:
+                base_queryset = base_queryset.filter(quater_id=entity_id)
+            else:
+                base_queryset = base_queryset.filter(sector_id=entity_id)
         
 
         position_lat = float(position_lat) if position_lat else None
@@ -84,3 +100,44 @@ class FIViewSet(ModelViewSet):
         else:
             serializer = MinimalFiSerializer(queryset, many=True)
             return Response(serializer.data)
+        
+        
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Query string to search for a family instance', required=True)
+        ]
+    )
+    @action(detail=False, methods=['get'])
+    def auto_complete(self, request):
+        """
+        This method is used to search for a family instance
+        """
+        q = request.query_params.get('q')
+        
+        total_result_size = 10
+        
+        #serach all sectors that contains the query ignore accents
+        sectors = Sector.objects.filter(label__unaccent__icontains=q).select_related('type')
+        
+        #just fetch the first 10 sectors
+        sectors = sectors[:7]
+        
+        sector_count = sectors.count()
+        
+        #search all families that contains the query ignore accents
+        families = Fi.objects.filter(name__unaccent__icontains=q)
+        
+        #just fetch the first 10 families
+        families = families[:total_result_size - sector_count]
+        
+        #serialize the result in the format {"entity_id": id, "entity_name": name, "entity_type": type}
+        result = []
+        
+        for sector in sectors:
+            result.append({"entity_id": sector.id, "entity_name": sector.label, "entity_type": sector.type.name})
+            
+        for family in families:
+            result.append({"entity_id": family.id, "entity_name": family.name, "entity_type": "family"})
+            
+        return Response(result)

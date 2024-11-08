@@ -18,7 +18,7 @@ class SectorType(DateFiedsMixing):
 
 class Sector(MP_Node, DateFiedsMixing):
     type = models.ForeignKey(SectorType, on_delete=models.CASCADE)
-    label = models.TextField(null=False, blank=False)
+    label = models.CharField(null=False, blank=False, max_length=255)
     
     def __str__(self):
         return self.label
