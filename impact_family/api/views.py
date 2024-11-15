@@ -15,12 +15,13 @@ from rest_framework.permissions import AllowAny
 from sectors.constants import SectorTypeCts
 from sectors.models import Sector
 from ..filters import MinimalFIListFilter
-from django.db.models.query import QuerySet
+from django.db.models.query import QuerySet, Q
 from django.db.models import Prefetch
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.db.models.functions import Distance
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
 class FIViewSet(ModelViewSet):
     queryset = Fi.objects.all()
     serializer_class = FiSerializer
@@ -57,7 +58,16 @@ class FIViewSet(ModelViewSet):
                 base_queryset = base_queryset.filter(id=entity_id)
             
             elif entity_type == SectorTypeCts.QUATER:
-                base_queryset = base_queryset.filter(quater_id=entity_id)
+                quater = Sector.objects.filter(id=entity_id).first()
+                q_objects = Q(quater_id=entity_id)
+                if quater:
+                    quater_name = quater.label
+                    splited_names = quater_name.split(" ")
+                    #remove all items that the length is less than 3
+                    for item in splited_names:
+                        if len(item) > 3:
+                            q_objects |= Q(quater__label__icontains=item)
+                base_queryset = base_queryset.filter(q_objects)
             else:
                 base_queryset = base_queryset.filter(sector_id=entity_id)
         
