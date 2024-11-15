@@ -122,7 +122,7 @@ class FiSerializer(serializers.ModelSerializer):
         #round to 2 decimal places
         dist = round(dist, 2)
         
-        return dist
+        return float(dist)
     
 
 class DetailedFiSerializer(FiSerializer):
