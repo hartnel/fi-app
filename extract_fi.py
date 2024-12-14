@@ -16,7 +16,7 @@ for i, fi in enumerate(all_fis):
         coords = location.location.coords[::-1]
         lat = coords[0]
         lon = coords[1]
-        location_label = fi.sector.label
+        location_label = location.label
 
     if fi.quater:
         quater_label = fi.quater.label
