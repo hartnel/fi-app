@@ -10,7 +10,7 @@ for i, fi in enumerate(all_fis):
     lat=""
     lon=""
     if location:
-        coords = location.coords[::-1]
+        coords = location.location.coords[::-1]
         lat = coords[0]
         lon = coords[1]
 
