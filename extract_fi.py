@@ -6,10 +6,11 @@ all_fis = Fi.objects.all()
 json_file = "fis.json"
 items = []
 for i, fi in enumerate(all_fis):
-    coords = fi.location.location.coords[::-1]
+    location = fi.location
     lat=""
     lon=""
-    if coords:
+    if location:
+        coords = location.coords[::-1]
         lat = coords[0]
         lon = coords[1]
 
