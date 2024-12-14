@@ -36,6 +36,6 @@ for i, fi in enumerate(all_fis):
 
 #write all to json
 with open(json_file, "w") as f:
-    f.write(json.dump(items))
+    f.write(json.dumps(items))
 
 
